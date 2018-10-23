@@ -1,7 +1,8 @@
-server:
-  port: 8888
-
 spring:
+  main:
+    banner-mode: "OFF"
+  profiles:
+    active: production
 # 数据源连接
   jpa:
     show-sql: true
@@ -26,4 +27,32 @@ spring:
     password:
 #    schema: classpath:sql/springboot1_readinglist-schema.sql
 #    data: classpath:sql/springboot1_readinglist-data.sql
+server:
+  port: 8443
+  ssl:
+  # keytool -keystore spring-boot-1.jks -genkey -alias tomcat -keyalg RSA
+    key-store: classpath:https.jks
+    key-store-password: 12341234
+    key-password: 12341234
+logging:
+  level:
+    root: INFO
+# properties
+amazon:
+  associate-id: AA
 
+---
+spring:
+  profiles: development
+logging:
+  level:
+    root: DEBUG
+
+---
+spring:
+  profiles: production
+logging:
+  level:
+    root: WARN
+  path: ~/tmp/
+  file: spring-boot-1-pro.log

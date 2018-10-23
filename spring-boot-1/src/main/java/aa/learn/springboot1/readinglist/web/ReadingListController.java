@@ -1,5 +1,6 @@
 package aa.learn.springboot1.readinglist.web;
 
+import aa.learn.springboot1.readinglist.entity.AmazonProperties;
 import aa.learn.springboot1.readinglist.entity.ReadItem;
 import aa.learn.springboot1.readinglist.repository.ReadingListRepository;
 import org.springframework.stereotype.Controller;
@@ -23,12 +24,16 @@ public class ReadingListController {
     @Resource
     private ReadingListRepository readingListRepository;
 
+    @Resource
+    private AmazonProperties amazonProperties;
+
 //    @RequestMapping(value = "/{reader}", method = RequestMethod.GET)
     @GetMapping("/{reader}")
     public String readersBooks(@PathVariable String reader, Model model) {
         List<ReadItem> readingList = readingListRepository.findByReader(reader);
         model.addAttribute("books", readingList);
         model.addAttribute("name", reader);
+        model.addAttribute("amazonId", amazonProperties.getAssociateId());
         return "reading-list/reading-list";
     }
 

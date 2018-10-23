@@ -3,6 +3,7 @@ package aa.learn.springboot1.readinglist.security;
 import aa.learn.springboot1.readinglist.repository.ReaderRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -11,10 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 import javax.annotation.Resource;
 
@@ -25,6 +23,8 @@ import javax.annotation.Resource;
  */
 @Configuration
 @EnableWebSecurity
+// 仅在spring.profiles.active: production时，才应用SecurityConfig配置； 否则会忽略该配置，由于缺少覆盖的安全配置，而应用自动配置的安全配置 P60
+@Profile("production")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
@@ -32,13 +32,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
     private PasswordEncoder passwordEncoder;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        //    PasswordEncoderFactories
-        return new BCryptPasswordEncoder();
-//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
 
     @Override
     public void configure(WebSecurity web) {
@@ -73,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService((String username) -> {
+        auth.userDetailsService(username -> {
                     UserDetails userDetails = readerRepository.findById(username).orElse(null);
                     if (userDetails == null) {
                         throw new UsernameNotFoundException("User '" + username + "' not found.");
